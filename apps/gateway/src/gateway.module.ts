@@ -6,10 +6,11 @@ import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { envSchema } from './config/env.schema';
 import { LoggerMiddleware } from './middleware/logger.middleware';
-import { APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { LoggingInterceptor } from './interceptor/logging.interceptor';
 import { SchemaValidationPipe } from './pipes/schema-validation.pipe';
+import { HttpExceptionFilter } from './filters/http-exeception.filter';
 
 @Module({
   imports: [
@@ -41,7 +42,8 @@ import { SchemaValidationPipe } from './pipes/schema-validation.pipe';
     //   scope: Scope.REQUEST,
     //   useClass: LoggingInterceptor,
     // },
-    // { provide: APP_GUARD, useClass: AuthGuard }, - globally with dependencies
+    // { provide: APP_GUARD, useClass: AuthGuard }
+    // { provide: APP_FILTER, useClass: HttpExceptionFilter },
   ],
 })
 export class GatewayModule {

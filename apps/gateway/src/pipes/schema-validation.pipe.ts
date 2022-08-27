@@ -12,9 +12,9 @@ export class SchemaValidationPipe implements PipeTransform {
   private readonly logger = new Logger(SchemaValidationPipe.name);
 
   transform(value: any, metadata: ArgumentMetadata) {
-    this.logger.verbose(SchemaValidationPipe.name, value, metadata);
+    this.logger.verbose(SchemaValidationPipe.name);
     const { password } = value;
-    // Object.freeze(value);
+
     if (password !== '123') {
       throw new UnauthorizedException();
     }

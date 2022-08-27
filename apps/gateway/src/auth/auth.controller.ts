@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpCode,
   Post,
@@ -8,6 +9,7 @@ import {
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
+import { HttpExceptionFilter } from '../filters/http-exeception.filter';
 import { AuthGuard } from '../guards/auth.guard';
 import { SchemaValidationPipe } from '../pipes/schema-validation.pipe';
 import { AuthService } from './auth.service';
@@ -20,9 +22,12 @@ export class AuthController {
   // @UseGuards(AuthGuard)
   // @UseGuards(SchemaValidationPipe)
   authHealthCheck(@Body(new SchemaValidationPipe()) body: any) {
-    body.something = 'hello';
-
-    console.log(body);
     return this.authService.authHealthCheck();
+  }
+
+  @Get('error')
+  @UseFilters(HttpExceptionFilter)
+  handleError() {
+    throw new ForbiddenException('Custom error message');
   }
 }

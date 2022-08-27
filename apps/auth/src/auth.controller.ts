@@ -7,7 +7,6 @@ import {
 import { AuthService } from './auth.service';
 import { MessagePattern, RpcException } from '@nestjs/microservices';
 import { ExceptionFilter } from '@app/common';
-import { UnauthorizedExceptionFilter } from '@app/common/filters/unauthorized-exception.filter';
 
 @Controller()
 export class AuthController {
