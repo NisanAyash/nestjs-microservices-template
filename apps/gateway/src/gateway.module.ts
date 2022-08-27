@@ -1,24 +1,26 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, Scope } from '@nestjs/common';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { GatewayController } from './gateway.controller';
-import { GatewayService } from './gateway.service';
-import * as Joi from 'joi';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { envSchema } from './config/env.schema';
+import { LoggerMiddleware } from './middleware/logger.middleware';
+import { APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { AuthGuard } from './guards/auth.guard';
+import { LoggingInterceptor } from './interceptor/logging.interceptor';
+import { SchemaValidationPipe } from './pipes/schema-validation.pipe';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      validationSchema: Joi.object({
-        API_GATEWAY_PORT: Joi.number().required(),
-        AUTH_SERVICE_PORT: Joi.number().required(),
-        AUTH_SERVICE_HOST: Joi.string().required(),
-      }),
+      validationSchema: envSchema,
     }),
   ],
-  controllers: [GatewayController],
+  controllers: [AuthController],
   providers: [
+    AuthService,
     {
       provide: 'AUTH_SERVICE',
       useFactory: (config: ConfigService) => {
@@ -34,7 +36,16 @@ import * as Joi from 'joi';
       },
       inject: [ConfigService],
     },
-    GatewayService,
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   scope: Scope.REQUEST,
+    //   useClass: LoggingInterceptor,
+    // },
+    // { provide: APP_GUARD, useClass: AuthGuard }, - globally with dependencies
   ],
 })
-export class GatewayModule {}
+export class GatewayModule {
+  configure(consumer: MiddlewareConsumer) {
+    // consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

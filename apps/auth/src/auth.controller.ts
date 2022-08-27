@@ -1,15 +1,24 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+  Controller,
+  HttpCode,
+  UnauthorizedException,
+  UseFilters,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { MessagePattern } from '@nestjs/microservices';
+import { MessagePattern, RpcException } from '@nestjs/microservices';
+import { ExceptionFilter } from '@app/common';
+import { UnauthorizedExceptionFilter } from '@app/common/filters/unauthorized-exception.filter';
 
 @Controller()
 export class AuthController {
+  private users: { username: string }[] = [{ username: 'nisan' }];
+
   constructor(private readonly authService: AuthService) {}
 
   @MessagePattern('auth_health_check')
-  healthCheck(data: any) {
-    console.log('AUTH_SERVICE RECEIVED MESSAGE ', data);
-    console.count();
-    return 'alive';
+  async healthCheck(data: any) {
+    const { email, password } = data;
+
+    return 'ok';
   }
 }
