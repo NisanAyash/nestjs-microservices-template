@@ -1,6 +1,7 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, HttpException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { catchError, of } from 'rxjs';
+import { catchError, of, firstValueFrom, lastValueFrom, timeout } from 'rxjs';
+import { SigninRequestDto } from '../dto/signin-request.dto';
 
 @Injectable()
 export class AuthService {
@@ -8,14 +9,17 @@ export class AuthService {
     @Inject('AUTH_SERVICE') private readonly authClient: ClientProxy,
   ) {}
 
-  authHealthCheck() {
-    return this.authClient
-      .send('auth_health_check', {
-        email: 'mosa@gmail.com',
-        password: 'password12',
-      })
-      .pipe(catchError((err) => of({ message: err.message })));
+  async signin(dto: SigninRequestDto) {
+    try {
+      const result = await firstValueFrom(
+        this.authClient.send('auth_health_check', dto).pipe(timeout(3000)),
+      );
 
-    // ;
+      console.log(result);
+      return result;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException({ status: '401', error: error.message }, 401);
+    }
   }
 }

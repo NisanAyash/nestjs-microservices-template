@@ -20,18 +20,21 @@ async function bootstrapAuthService() {
 async function bootstrap() {
   const app = await NestFactory.create(AuthModule);
 
-  app.connectMicroservice({
-    transport: Transport.TCP,
-    options: {
-      host: '0.0.0.0',
-      port: 3001,
+  app.connectMicroservice(
+    {
+      transport: Transport.TCP,
+      options: {
+        host: '0.0.0.0',
+        port: 3001,
+      },
     },
-  });
+    { inheritAppConfig: true },
+  );
 
   await app.startAllMicroservices();
   await app.listen(3001);
 }
 
-// bootstrap();
+bootstrap();
 
-bootstrapAuthService();
+// bootstrapAuthService();

@@ -1,12 +1,8 @@
-import {
-  Controller,
-  HttpCode,
-  UnauthorizedException,
-  UseFilters,
-} from '@nestjs/common';
+import { Controller, UseFilters } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { MessagePattern, RpcException } from '@nestjs/microservices';
-import { ExceptionFilter } from '@app/common';
+import { ExceptionFilter } from './filters/rpc-exception.filter';
+import { SigninRequestDto } from './dto/signin-request.dto';
 
 @Controller()
 export class AuthController {
@@ -14,10 +10,11 @@ export class AuthController {
 
   constructor(private readonly authService: AuthService) {}
 
+  @UseFilters(new ExceptionFilter())
   @MessagePattern('auth_health_check')
-  async healthCheck(data: any) {
-    const { email, password } = data;
-
-    return 'ok';
+  async healthCheck(dto: SigninRequestDto) {
+    const { email, password } = dto;
+    return dto;
+    // throw new RpcException(`UnauthorizedException aaaaaaaaaaaaaaaa`);
   }
 }
